@@ -6,8 +6,6 @@
 #include <QJsonObject>
 #include <stdexcept>
 
-// پیاده‌سازی عمومی IRepository<T> با استفاده از یک فایل JSON.
-// نیازمندی‌های T: getId() const, toJson() const, static T fromJson(QJsonObject)
 template <typename T>
 class FileRepository : public IRepository<T> {
 protected:
@@ -20,7 +18,7 @@ public:
         QVector<T> result;
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly)) {
-            return result; // فایل هنوز وجود ندارد -> لیست خالی
+            return result;
         }
         QByteArray data = file.readAll();
         file.close();

@@ -1,8 +1,6 @@
 #pragma once
 #include <QVector>
 
-// این یک Interface عمومی است. هر نوع T (مثل Account، Book، Cart) می‌تواند
-// از این استفاده کند، به شرطی که سه متد getId/toJson/fromJson را داشته باشد.
 template <typename T>
 class IRepository {
 public:
