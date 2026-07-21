@@ -11,6 +11,15 @@ qt_add_executable(BOOK_CLUB
     loginpage.cpp
     loginpage.h
     loginpage.ui
+    managers/bookmanager.h managers/bookmanager.cpp
+    models/book.h models/book.cpp
+    repositories/filebookstorage.h repositories/filebookstorage.cpp
+    repositories/ibookstorage.h
+    repositories/irepository.h
+    repositories/filerepository.h
+
+
+
 )
 
 target_link_libraries(BOOK_CLUB
