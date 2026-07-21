@@ -11,6 +11,8 @@ qt_add_executable(BOOK_CLUB
     loginpage.cpp
     loginpage.h
     loginpage.ui
+    src/models/Account.h src/models/Account.cpp
+    src/models/User.h src/models/User.cpp
 )
 
 target_link_libraries(BOOK_CLUB
