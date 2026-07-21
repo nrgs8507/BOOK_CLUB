@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include "Account.h"
+#include "account.h"
 #include <QList>
 #include <QString>
 
