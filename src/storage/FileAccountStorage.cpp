@@ -1,4 +1,6 @@
 #include "FileAccountStorage.h"
+#include <QDir>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QCryptographicHash>
 
@@ -7,6 +9,9 @@ FileAccountStorage::FileAccountStorage(const QString& filePath)
 
 QJsonArray FileAccountStorage::loadAllFromFile() const {
     QFile file(filePath);
+    if(!file.exists()) {
+        return QJsonArray();
+    }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return QJsonArray();
     }
@@ -23,6 +28,10 @@ QJsonArray FileAccountStorage::loadAllFromFile() const {
 }
 
 bool FileAccountStorage::saveAllToFile(const QJsonArray& usersArray) const {
+    QDir dir;
+    if(!dir.exists(filePath)) {
+        dir.mkpath(QFileInfo(filePath).absolutePath());
+    }
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qDebug() << "Error opening file for writing: " << filePath;
@@ -40,7 +49,7 @@ QJsonObject FileAccountStorage::userToJson(const User& user) const {
     json["username"] = user.getUsername();
     json["hashedPassword"] = user.getHashedPassword();
     json["role"] = user.getRoleString();
-    json["isBlocked"] = user.getisBlocked();
+    json["isBlocked"] = user.getIsBlocked();
     json["registerDate"] = user.getRegisterDate().toString(Qt::ISODate);
     json["fullName"] = user.getFullName();
     json["securityQuestion"] = user.getSecurityQuestion();

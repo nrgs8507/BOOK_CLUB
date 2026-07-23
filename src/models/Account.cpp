@@ -16,7 +16,7 @@ Account::Account(const QString& username, const QString& hashedPassword,
 QString Account::getUsername() const { return username; }
 QString Account::getHashedPassword() const { return hashedPassword; }
 Role Account::getRole() const { return role; }
-bool Account::getisBlocked() const { return isBlocked; }
+bool Account::getIsBlocked() const { return isBlocked; }
 QDate Account::getRegisterDate() const { return registerDate; }
 QString Account::getFullName() const { return fullName; }
 QString Account::getSecurityQuestion() const { return securityQuestion; }

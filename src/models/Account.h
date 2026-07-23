@@ -21,7 +21,7 @@ public:
     QString getUsername() const;
     QString getHashedPassword() const;
     Role getRole() const;
-    bool getisBlocked() const;
+    bool getIsBlocked() const;
     QDate getRegisterDate() const;
     QString getFullName() const;
     QString getSecurityQuestion() const;

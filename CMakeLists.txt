@@ -15,6 +15,7 @@ qt_add_executable(BOOK_CLUB
     src/models/User.h src/models/User.cpp
     src/storage/IAccountStorage.h src/storage/IAccountStorage.cpp
     src/storage/FileAccountStorage.h src/storage/FileAccountStorage.cpp
+    src/auth/AuthManager.h src/auth/AuthManager.cpp
 )
 
 target_link_libraries(BOOK_CLUB
