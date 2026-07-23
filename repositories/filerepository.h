@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 template <typename T>
-class FileRepository :virtual public IRepository<T> {
+class FileRepository : public virtual IRepository<T> {
 protected:
     QString filePath;
 

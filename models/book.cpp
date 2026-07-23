@@ -10,7 +10,7 @@ Book::Book(int bookId, const QString& title, const QString& author, const QStrin
            const QString& pdfFilePath, int publisherId, const QDate& publishDate)
     : bookId(bookId), title(title), author(author), genre(genre), description(description),
     price(price), coverImagePath(coverImagePath), pdfFilePath(pdfFilePath),
-    publisherId(publisherId), isActive(true), averageRating(0.0), salesCount(0),
+    publisherId(publisherId), isActive(true), averageRating(-1.0), salesCount(0),
     publishDate(publishDate), discount(nullptr) {}
 
 int Book::getId() const { return bookId; }
@@ -34,6 +34,9 @@ double Book::getFinalPrice() const {
         return discount->getDiscountedPrice(price);
     }
     return price;
+}
+bool Book::hasReviews() const {
+    return averageRating >= 0.0;
 }
 
 void Book::setTitle(const QString& t) { title = t; }

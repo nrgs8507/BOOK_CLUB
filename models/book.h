@@ -46,6 +46,7 @@ public:
     QDate getPublishDate() const;
     std::shared_ptr<Discount> getDiscount() const;
     double getFinalPrice() const;
+    bool hasReviews() const;
 
     void setTitle(const QString& title);
     void setAuthor(const QString& author);
