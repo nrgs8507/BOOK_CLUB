@@ -8,9 +8,9 @@ qt_standard_project_setup()
 qt_add_executable(BOOK_CLUB
     WIN32 MACOSX_BUNDLE
     main.cpp
-    loginpage.cpp
-    loginpage.h
-    loginpage.ui
+    src/ui/loginpage.cpp
+    src/ui/loginpage.h
+    src/ui/loginpage.ui
     src/models/Account.h src/models/Account.cpp
     src/models/User.h src/models/User.cpp
     src/storage/IAccountStorage.h src/storage/IAccountStorage.cpp
