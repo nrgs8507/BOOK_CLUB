@@ -1,14 +1,14 @@
 #include "User.h"
 
-User::User() : Account() {
-    role = Role::User;
-}
+User::User() : Account() {}
 
-User::User(const QString& username, const QString& hashedPassword,
+User::User(int userId, const QString& username, const QString& hashedPassword,
            const QString& fullName, const QString& securityQuestion,
-           const QString& hashedSecurityAnswer)
-    : Account(username, hashedPassword, Role::User, fullName,
-              securityQuestion, hashedSecurityAnswer) {}
+           const QString& hashedSecurityAnswer,
+           const QList<QString>& favoriteGenres)
+    : Account(userId, username, hashedPassword, fullName, securityQuestion,
+              hashedSecurityAnswer, Role::User, false, QDate::currentDate()),
+    favoriteGenres(favoriteGenres) {}
 
 QList<QString> User::getFavoriteGenres() const {
     return favoriteGenres;
@@ -30,4 +30,27 @@ void User::removeFavoriteGenre(const QString& genre) {
 
 QString User::getRoleString() const {
     return "User";
+}
+
+QJsonObject User::toJson() const {
+    QJsonObject json = Account::toJson();
+    QJsonArray genresArray;
+    for (const QString& genre : favoriteGenres) {
+        genresArray.append(genre);
+    }
+    json["favoriteGenres"] = genresArray;
+    return json;
+}
+
+User User::fromJson(const QJsonObject& json) {
+    Account base = Account::fromJson(json);
+    QList<QString> genres;
+    QJsonArray genresArray = json["favoriteGenres"].toArray();
+    for (const QJsonValue& val : genresArray) {
+        genres.append(val.toString());
+    }
+
+    return User(base.getId(), base.getUsername(), base.getHashedPassword(),
+                base.getFullName(), base.getSecurityQuestion(),
+                base.getHashedSecurityAnswer(), genres);
 }

@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QDate>
+#include <QJsonObject>
+#include <QJsonArray>
 
 enum class Role {
     User,
@@ -13,39 +15,45 @@ enum class Role {
 class Account {
 public:
     Account();
-    Account(const QString& username, const QString& hashedPassword,
-            Role role, const QString& fullName,
-            const QString& securityQuestion, const QString& hashedSecurityAnswer);
+    Account(int userId, const QString& username, const QString& hashedPassword,
+            const QString& fullName, const QString& securityQuestion,
+            const QString& hashedSecurityAnswer, Role role = Role::User,
+            bool isBlocked = false, const QDate& registerDate = QDate::currentDate());
 
     // Getters
+    int getId() const;  // <-- new
     QString getUsername() const;
     QString getHashedPassword() const;
-    Role getRole() const;
-    bool getIsBlocked() const;
-    QDate getRegisterDate() const;
     QString getFullName() const;
     QString getSecurityQuestion() const;
     QString getHashedSecurityAnswer() const;
+    Role getRole() const;
+    bool getIsBlocked() const;
+    QDate getRegisterDate() const;
 
     // Setters
     void setHashedPassword(const QString& newPassword);
-    void setBlocked(bool blocked);
     void setFullName(const QString& fullName);
     void setSecurityQuestion(const QString& question);
     void setHashedSecurityAnswer(const QString& answer);
+    void setBlocked(bool blocked);
 
-    // Utility
     virtual QString getRoleString() const;
 
+    // JSON Serialization (برای هماهنگی با FileRepository)
+    QJsonObject toJson() const;
+    static Account fromJson(const QJsonObject& json);
+
 protected:
+    int userId;
     QString username;
     QString hashedPassword;
+    QString encryptedFullName;
+    QString encryptedSecurityQuestion;
+    QString hashedSecurityAnswer;
     Role role;
     bool isBlocked;
     QDate registerDate;
-    QString fullName;
-    QString securityQuestion;
-    QString hashedSecurityAnswer;
 };
 
 #endif // ACCOUNT_H

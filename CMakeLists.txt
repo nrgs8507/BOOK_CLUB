@@ -3,6 +3,7 @@ project(BOOK_CLUB LANGUAGES CXX)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
 qt_standard_project_setup()
 
 qt_add_executable(BOOK_CLUB
@@ -16,6 +17,8 @@ qt_add_executable(BOOK_CLUB
     src/storage/IAccountStorage.h src/storage/IAccountStorage.cpp
     src/storage/FileAccountStorage.h src/storage/FileAccountStorage.cpp
     src/auth/AuthManager.h src/auth/AuthManager.cpp
+    src/utils/cryptomanager.h src/utils/cryptomanager.cpp
+    src/utils/cryptomanager.h src/utils/cryptomanager.cpp
 )
 
 target_link_libraries(BOOK_CLUB
