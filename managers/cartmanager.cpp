@@ -74,12 +74,8 @@ bool CartManager::checkout(int userId) {
         Book book = bookManager->getBookById(bookId);
         double finalPrice = book.getFinalPrice();
 
-        // TODO: وقتی TransactionManager آماده شد:
-        // transactionManager->recordTransaction(userId, bookId, finalPrice);
-
-        // TODO: وقتی LibraryManager آماده شد:
-        // libraryManager->addBookToLibrary(userId, bookId);
-
+        transactionManager->recordTransaction(userId, bookId, finalPrice);
+        libraryManager->addBookToLibrary(userId, bookId);
         bookManager->incrementSalesCount(bookId);
     }
 

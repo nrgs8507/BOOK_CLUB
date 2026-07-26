@@ -4,9 +4,8 @@
 #include "discountmanager.h"
 #include "../models/cart.h"
 #include <QVector>
-
-class LibraryManager;
-class TransactionManager;
+#include "librarymanager.h"
+#include "transactionmanager.h"
 
 class CartManager {
 private:
