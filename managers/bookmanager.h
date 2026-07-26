@@ -1,10 +1,33 @@
-#ifndef BOOKMANAGER_H
-#define BOOKMANAGER_H
+#pragma once
+#include "../repositories/ibookstorage.h"
+#include "../models/book.h"
+#include <QVector>
+#include <QString>
 
-class bookmanager
-{
+class BookManager {
+private:
+    IBookStorage* storage;
+
+    int generateNewId() const;
+
 public:
-    bookmanager();
-};
+    explicit BookManager(IBookStorage* storage);
 
-#endif // BOOKMANAGER_H
+    Book getBookById(int bookId);
+    QVector<Book> getAllBooks();
+    QVector<Book> getActiveBooks();
+
+    QVector<Book> searchByGenre(const QString& genre);
+    QVector<Book> searchByTitle(const QString& title);
+    QVector<Book> searchByAuthor(const QString& author);
+
+    int addBook(Book book);
+    void updateBook(const Book& book);
+
+    void activateBook(int bookId);
+    void deactivateBook(int bookId);
+    void deleteBook(int bookId);
+
+    void incrementSalesCount(int bookId);
+    void updateAverageRating(int bookId, double newAverage);
+};
