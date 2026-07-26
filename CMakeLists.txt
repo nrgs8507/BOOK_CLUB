@@ -17,6 +17,10 @@ qt_add_executable(BOOK_CLUB
     repositories/ibookstorage.h
     repositories/irepository.h
     repositories/filerepository.h
+    managers/cartmanager.h managers/cartmanager.cpp
+    models/cart.h models/cart.cpp
+    repositories/filecartstorage.h repositories/filecartstorage.cpp
+    repositories/icartstorage.h
 
 
 
