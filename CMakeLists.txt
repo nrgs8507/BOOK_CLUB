@@ -9,8 +9,8 @@ qt_standard_project_setup()
 qt_add_executable(BOOK_CLUB
     WIN32 MACOSX_BUNDLE
     main.cpp
-    src/ui/loginpage.cpp
     src/ui/loginpage.h
+    src/ui/loginpage.cpp
     src/ui/loginpage.ui
     src/models/Account.h src/models/Account.cpp
     src/models/User.h src/models/User.cpp
@@ -19,6 +19,7 @@ qt_add_executable(BOOK_CLUB
     src/auth/AuthManager.h src/auth/AuthManager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
+    src/ui/loginpage.h src/ui/loginpage.cpp src/ui/loginpage.ui
 )
 
 target_link_libraries(BOOK_CLUB

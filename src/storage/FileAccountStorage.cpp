@@ -1,4 +1,5 @@
 #include "FileAccountStorage.h"
+#include "utils/cryptomanager.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -59,32 +60,21 @@ QJsonObject FileAccountStorage::userToJson(const User& user) const {
 }
 
 User FileAccountStorage::jsonToUser(const QJsonObject& json) const {
-    User user(
-        json["username"].toString(),
-        json["hashedPassword"].toString(),
-        json["fullName"].toString(),
-        json["securityQuestion"].toString(),
-        json["hashedSecurityAnswer"].toString()
-        );
+    int userId = json["userId"].toInt();
+    QString username = json["username"].toString();
+    QString hashedPassword = json["hashedPassword"].toString();
+    QString fullName = CryptoManager::decryptTwoWay(json["encryptedFullName"].toString());
+    QString securityQuestion = CryptoManager::decryptTwoWay(json["encryptedSecurityQuestion"].toString());
+    QString hashedSecurityAnswer = json["hashedSecurityAnswer"].toString();
 
-    if (json["isBlocked"].toBool()) {
-        user.setBlocked(true);
-    }
-
-    if (json.contains("registerDate")) {
-        QDate date = QDate::fromString(json["registerDate"].toString(), Qt::ISODate);
-        // Note: registerDate is protected, we might need a setter or workaround
-        // For now, we just keep the default
-    }
-
-    QStringList genres;
+    QList<QString> favoriteGenres;
     QJsonArray genresArray = json["favoriteGenres"].toArray();
     for (const QJsonValue& val : genresArray) {
-        genres << val.toString();
+        favoriteGenres.append(val.toString());
     }
-    user.setFavoriteGenres(genres);
 
-    return user;
+    return User(userId, username, hashedPassword, fullName,
+                securityQuestion, hashedSecurityAnswer, favoriteGenres);
 }
 
 bool FileAccountStorage::saveUser(const User& user) {

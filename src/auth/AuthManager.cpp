@@ -27,7 +27,9 @@ bool AuthManager::registerUser(const QString& username, const QString& password,
     QString hashedSecurityAnswer = hashString(securityAnswer);
 
     // 3. Create new User object
-    User newUser(username, hashedPassword, fullName, securityQuestion, hashedSecurityAnswer);
+    static int nextUserId =1;
+    int userId = nextUserId++;
+    User newUser(userId, username, hashedPassword, fullName, securityQuestion, hashedSecurityAnswer , {});
 
     // 4. Save to storage
     return storage->saveUser(newUser);

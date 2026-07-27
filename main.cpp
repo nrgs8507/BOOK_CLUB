@@ -9,31 +9,38 @@ int main(int argc, char *argv[])
     w.show();
     return QApplication::exec();
 }*/
-#include <QCoreApplication>
-#include <QDebug>
+#include <QApplication>
+#include "src/ui/loginpage.h"
 #include "src/auth/AuthManager.h"
 #include "src/storage/FileAccountStorage.h"
+#include <memory>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
+    // 1. Create storage and auth manager
     auto storage = std::make_shared<FileAccountStorage>("data/users.json");
+    auto authManager = std::make_shared<AuthManager>(storage);
 
-    AuthManager auth(storage);
+    // 2. Register a test user (if not exists)
+    bool registered = authManager->registerUser(
+        "saba",
+        "1234",
+        "Saba Net",
+        "What is your favorite book?",
+        "C++"
+        );
 
-    bool registered = auth.registerUser("saba", "1234", "Saba Net", "What is your favorite book?", "C++");
-    qDebug() << "Registration:" << (registered ? "Success ✅" : "Failed ❌");
-
-    auto user = auth.login("saba", "1234");
-    if (user) {
-        qDebug() << "Login successful! Welcome" << user->getFullName() << "🎉";
+    if (registered) {
+        qDebug() << "Test user 'saba' registered successfully!";
     } else {
-        qDebug() << "Login failed! ❌";
+        qDebug() << "User 'saba' already exists.";
     }
 
-    bool duplicate = auth.registerUser("saba", "5678", "Duplicate", "Question", "Answer");
-    qDebug() << "Duplicate registration:" << (duplicate ? "Success ❌" : "Failed ✅ (correct behavior)");
+    // 3. Show login page
+    loginpage w(authManager);
+    w.show();
 
     return a.exec();
 }

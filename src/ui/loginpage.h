@@ -1,28 +1,28 @@
 #ifndef LOGINPAGE_H
 #define LOGINPAGE_H
 
-#include <QWidget>
+#include <QMainWindow>  // <-- QWidget رو به QMainWindow تغییر بده
 #include <memory>
 #include "../auth/AuthManager.h"
 
 namespace Ui {
-class LoginPage;
+class loginpage;
 }
 
-class LoginPage : public QWidget
+class loginpage : public QMainWindow  // <-- QWidget رو به QMainWindow تغییر بده
 {
     Q_OBJECT
 
 public:
-    explicit LoginPage(std::shared_ptr<AuthManager> authManager, QWidget *parent = nullptr);
-    ~LoginPage();
+    explicit loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent = nullptr);
+    ~loginpage();
 
 private slots:
     void onLoginButtonClicked();
     void onRegisterButtonClicked();
 
 private:
-    Ui::LoginPage *ui;
+    Ui::loginpage *ui;
     std::shared_ptr<AuthManager> authManager;
 };
 
