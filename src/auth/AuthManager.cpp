@@ -25,7 +25,6 @@ bool AuthManager::registerUser(const QString& username, const QString& password,
 
     User newUser(userId, username, hashedPassword, fullName,
                  securityQuestion, hashedSecurityAnswer, {});
-
     userRepository->save(newUser);
     return true;
 }

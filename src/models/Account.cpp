@@ -2,7 +2,6 @@
 #include "utils/cryptomanager.h"
 #include <QCryptographicHash>
 
-
 static int nextUserId = 1;
 
 Account::Account()
@@ -13,7 +12,7 @@ Account::Account(int userId, const QString& username, const QString& hashedPassw
                  const QString& hashedSecurityAnswer, Role role,
                  bool isBlocked, const QDate& registerDate)
     : userId(userId),
-    username(username),
+    encryptedUsername(CryptoManager::encryptTwoWay(username)),
     hashedPassword(hashedPassword),
     encryptedFullName(CryptoManager::encryptTwoWay(fullName)),
     encryptedSecurityQuestion(CryptoManager::encryptTwoWay(securityQuestion)),
@@ -22,18 +21,22 @@ Account::Account(int userId, const QString& username, const QString& hashedPassw
     isBlocked(isBlocked),
     registerDate(registerDate) {}
 
-int Account::getId() const {
-    return userId;
+int Account::getId() const { return userId; }
+
+QString Account::getUsername() const {
+    return CryptoManager::decryptTwoWay(encryptedUsername);
 }
 
-QString Account::getUsername() const { return username; }
 QString Account::getHashedPassword() const { return hashedPassword; }
+
 QString Account::getFullName() const {
     return CryptoManager::decryptTwoWay(encryptedFullName);
 }
+
 QString Account::getSecurityQuestion() const {
     return CryptoManager::decryptTwoWay(encryptedSecurityQuestion);
 }
+
 QString Account::getHashedSecurityAnswer() const { return hashedSecurityAnswer; }
 Role Account::getRole() const { return role; }
 bool Account::getIsBlocked() const { return isBlocked; }
@@ -42,17 +45,25 @@ QDate Account::getRegisterDate() const { return registerDate; }
 void Account::setHashedPassword(const QString& newPassword) {
     hashedPassword = newPassword;
 }
+
 void Account::setFullName(const QString& fullName) {
     encryptedFullName = CryptoManager::encryptTwoWay(fullName);
 }
+
 void Account::setSecurityQuestion(const QString& question) {
     encryptedSecurityQuestion = CryptoManager::encryptTwoWay(question);
 }
+
 void Account::setHashedSecurityAnswer(const QString& answer) {
     hashedSecurityAnswer = answer;
 }
+
 void Account::setBlocked(bool blocked) {
     isBlocked = blocked;
+}
+
+void Account::setRegisterDate(const QDate& date) {
+    registerDate = date;
 }
 
 QString Account::getRoleString() const {
@@ -64,11 +75,10 @@ QString Account::getRoleString() const {
     }
 }
 
-// ---------- JSON Serialization ----------
 QJsonObject Account::toJson() const {
     QJsonObject json;
     json["userId"] = userId;
-    json["username"] = username;
+    json["encryptedUsername"] = encryptedUsername;
     json["hashedPassword"] = hashedPassword;
     json["encryptedFullName"] = encryptedFullName;
     json["encryptedSecurityQuestion"] = encryptedSecurityQuestion;
@@ -81,24 +91,23 @@ QJsonObject Account::toJson() const {
 
 Account Account::fromJson(const QJsonObject& json) {
     int userId = json["userId"].toInt();
-    QString username = json["username"].toString();
+    QString encryptedUsername = json["encryptedUsername"].toString();
     QString hashedPassword = json["hashedPassword"].toString();
     QString encryptedFullName = json["encryptedFullName"].toString();
     QString encryptedSecurityQuestion = json["encryptedSecurityQuestion"].toString();
     QString hashedSecurityAnswer = json["hashedSecurityAnswer"].toString();
-    QString roleStr = json["role"].toString("User");
     bool isBlocked = json["isBlocked"].toBool(false);
     QDate registerDate = QDate::fromString(json["registerDate"].toString(), Qt::ISODate);
 
+    QString roleStr = json["role"].toString("User");
     Role role;
     if (roleStr == "Publisher") role = Role::Publisher;
     else if (roleStr == "Admin") role = Role::Admin;
     else role = Role::User;
 
-    // Create a temporary Account with all fields
     Account acc;
     acc.userId = userId;
-    acc.username = username;
+    acc.encryptedUsername = encryptedUsername;
     acc.hashedPassword = hashedPassword;
     acc.encryptedFullName = encryptedFullName;
     acc.encryptedSecurityQuestion = encryptedSecurityQuestion;
@@ -106,6 +115,5 @@ Account Account::fromJson(const QJsonObject& json) {
     acc.role = role;
     acc.isBlocked = isBlocked;
     acc.registerDate = registerDate;
-
     return acc;
 }
