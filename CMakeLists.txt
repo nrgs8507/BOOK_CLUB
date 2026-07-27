@@ -14,12 +14,12 @@ qt_add_executable(BOOK_CLUB
     src/ui/loginpage.ui
     src/models/Account.h src/models/Account.cpp
     src/models/User.h src/models/User.cpp
-    src/storage/IAccountStorage.h src/storage/IAccountStorage.cpp
-    src/storage/FileAccountStorage.h src/storage/FileAccountStorage.cpp
     src/auth/AuthManager.h src/auth/AuthManager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
     src/ui/loginpage.h src/ui/loginpage.cpp src/ui/loginpage.ui
+    src/repository/irepository.h
+    src/repository/filerepository.h
 )
 
 target_link_libraries(BOOK_CLUB

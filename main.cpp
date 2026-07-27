@@ -10,35 +10,34 @@ int main(int argc, char *argv[])
     return QApplication::exec();
 }*/
 #include <QApplication>
+#include <QDebug>
 #include "src/ui/loginpage.h"
 #include "src/auth/AuthManager.h"
-#include "src/storage/FileAccountStorage.h"
-#include <memory>
+#include "src/repository/FileRepository.h"
+#include "src/models/User.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // 1. Create storage and auth manager
-    auto storage = std::make_shared<FileAccountStorage>("data/users.json");
-    auto authManager = std::make_shared<AuthManager>(storage);
+    // Create repository
+    auto userRepo = std::make_shared<FileRepository<User>>("data/users.json");
 
-    // 2. Register a test user (if not exists)
-    bool registered = authManager->registerUser(
-        "saba",
-        "1234",
-        "Saba Net",
-        "What is your favorite book?",
-        "C++"
-        );
+    // Create auth manager
+    auto authManager = std::make_shared<AuthManager>(userRepo);
 
-    if (registered) {
-        qDebug() << "Test user 'saba' registered successfully!";
+    // Register test user (if not exists)
+    if (!authManager->usernameExists("saba")) {
+        bool registered = authManager->registerUser(
+            "saba", "1234", "Saba Net",
+            "What is your favorite book?", "C++"
+            );
+        qDebug() << (registered ? "User registered!" : "Registration failed!");
     } else {
         qDebug() << "User 'saba' already exists.";
     }
 
-    // 3. Show login page
+    // Show login page
     loginpage w(authManager);
     w.show();
 

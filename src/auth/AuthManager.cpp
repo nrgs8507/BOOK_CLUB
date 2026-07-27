@@ -1,114 +1,94 @@
 #include "AuthManager.h"
+#include "utils/cryptomanager.h"
 #include <QCryptographicHash>
 
-// Constructor
-AuthManager::AuthManager(std::shared_ptr<IAccountStorage> storage)
-    : storage(storage) {}
+AuthManager::AuthManager(std::shared_ptr<FileRepository<User>> userRepository)
+    : userRepository(userRepository) {}
 
-// ----- Helper: Hash Function -----
-QString AuthManager::hashString(const QString& input) const
-{
+QString AuthManager::hashString(const QString& input) const {
     QByteArray hash = QCryptographicHash::hash(input.toUtf8(), QCryptographicHash::Sha256);
     return QString(hash.toHex());
 }
 
-// ----- Register -----
 bool AuthManager::registerUser(const QString& username, const QString& password,
                                const QString& fullName, const QString& securityQuestion,
-                               const QString& securityAnswer)
-{
-    // 1. Check if username already exists
-    if (storage->findUserByUsername(username) != nullptr) {
-        return false; // Username taken
+                               const QString& securityAnswer) {
+    if (usernameExists(username)) {
+        return false;
     }
 
-    // 2. Hash password and security answer
     QString hashedPassword = hashString(password);
-    QString hashedSecurityAnswer = hashString(securityAnswer);
+    QString hashedSecurityAnswer = CryptoManager::encryptTwoWay(securityAnswer);
 
-    // 3. Create new User object
-    static int nextUserId =1;
+    static int nextUserId = 1;
     int userId = nextUserId++;
-    User newUser(userId, username, hashedPassword, fullName, securityQuestion, hashedSecurityAnswer , {});
 
-    // 4. Save to storage
-    return storage->saveUser(newUser);
+    User newUser(userId, username, hashedPassword, fullName,
+                 securityQuestion, hashedSecurityAnswer, {});
+
+    userRepository->save(newUser);
+    return true;
 }
 
-// ----- Login -----
-std::shared_ptr<User> AuthManager::login(const QString& username, const QString& password)
-{
-    // 1. Find user
-    auto user = storage->findUserByUsername(username);
-    if (!user) {
-        return nullptr; // User not found
+std::shared_ptr<User> AuthManager::login(const QString& username, const QString& password) {
+    QVector<User> allUsers = userRepository->getAll();
+    for (const User& user : allUsers) {
+        if (user.getUsername() == username) {
+            if (user.getIsBlocked()) {
+                return nullptr;
+            }
+            QString hashedInput = hashString(password);
+            if (user.getHashedPassword() == hashedInput) {
+                return std::make_shared<User>(user);
+            }
+            return nullptr;
+        }
     }
-
-    // 2. Check if user is blocked
-    if (user->getIsBlocked()) {
-        return nullptr; // User is blocked
-    }
-
-    // 3. Verify password
-    QString hashedInput = hashString(password);
-    if (user->getHashedPassword() != hashedInput) {
-        return nullptr; // Wrong password
-    }
-
-    // 4. Login successful
-    return user;
+    return nullptr;
 }
 
-// ----- Forgot Password (Reset via Security Question) -----
 bool AuthManager::forgotPassword(const QString& username, const QString& securityAnswer,
-                                 const QString& newPassword)
-{
-    // 1. Find user
-    auto user = storage->findUserByUsername(username);
-    if (!user) {
-        return false; // User not found
+                                 const QString& newPassword) {
+    QVector<User> allUsers = userRepository->getAll();
+    for (int i = 0; i < allUsers.size(); ++i) {
+        if (allUsers[i].getUsername() == username) {
+            QString hashedInput = CryptoManager::encryptTwoWay(securityAnswer);
+            if (allUsers[i].getHashedSecurityAnswer() != hashedInput) {
+                return false;
+            }
+            QString newHashedPassword = hashString(newPassword);
+            allUsers[i].setHashedPassword(newHashedPassword);
+            userRepository->save(allUsers[i]);
+            return true;
+        }
     }
-
-    // 2. Verify security answer
-    QString hashedInput = hashString(securityAnswer);
-    if (user->getHashedSecurityAnswer() != hashedInput) {
-        return false; // Wrong security answer
-    }
-
-    // 3. Update password
-    QString newHashedPassword = hashString(newPassword);
-    user->setHashedPassword(newHashedPassword);
-
-    // 4. Save changes
-    return storage->updateUser(*user);
+    return false;
 }
 
-// ----- Change Password (with old password verification) -----
 bool AuthManager::changePassword(const QString& username, const QString& oldPassword,
-                                 const QString& newPassword)
-{
-    // 1. Find user
-    auto user = storage->findUserByUsername(username);
-    if (!user) {
-        return false; // User not found
+                                 const QString& newPassword) {
+    QVector<User> allUsers = userRepository->getAll();
+    for (int i = 0; i < allUsers.size(); ++i) {
+        if (allUsers[i].getUsername() == username) {
+            QString hashedOld = hashString(oldPassword);
+            if (allUsers[i].getHashedPassword() != hashedOld) {
+                return false;
+            }
+            QString newHashedPassword = hashString(newPassword);
+            allUsers[i].setHashedPassword(newHashedPassword);
+            userRepository->save(allUsers[i]);
+            return true;
+        }
     }
-
-    // 2. Verify old password
-    QString hashedOld = hashString(oldPassword);
-    if (user->getHashedPassword() != hashedOld) {
-        return false; // Wrong old password
-    }
-
-    // 3. Update to new password
-    QString newHashedPassword = hashString(newPassword);
-    user->setHashedPassword(newHashedPassword);
-
-    // 4. Save changes
-    return storage->updateUser(*user);
+    return false;
 }
 
-// ----- Check if username exists -----
-bool AuthManager::usernameExists(const QString& username) const
-{
-    return storage->findUserByUsername(username) != nullptr;
+bool AuthManager::usernameExists(const QString& username) const {
+    QVector<User> allUsers = userRepository->getAll();
+    for (const User& user : allUsers) {
+        if (user.getUsername() == username) {
+            return true;
+        }
+    }
+    return false;
 }
