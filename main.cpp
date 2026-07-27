@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
 #include <QApplication>
 #include <QDebug>
 #include "src/ui/loginpage.h"
+#include "src/ui/registerpage.h"
 #include "src/auth/AuthManager.h"
 #include "src/repository/filerepository.h"
 #include "src/models/User.h"
@@ -20,10 +21,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Create repository
     auto userRepo = std::make_shared<FileRepository<User>>("data/users.json");
-
-    // Create auth manager
     auto authManager = std::make_shared<AuthManager>(userRepo);
 
     // Register test user (if not exists)
@@ -33,8 +31,6 @@ int main(int argc, char *argv[])
             "What is your favorite book?", "C++"
             );
         qDebug() << (registered ? "User registered!" : "Registration failed!");
-    } else {
-        qDebug() << "User 'saba' already exists.";
     }
 
     // Show login page

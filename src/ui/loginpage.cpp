@@ -1,6 +1,11 @@
 #include "loginpage.h"
 #include "ui_loginpage.h"
+#include "registerpage.h"
 #include <QMessageBox>
+#include <QDebug>
+#include <QStyle>
+#include <QScreen>
+#include <QGuiApplication>
 
 loginpage::loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     : QMainWindow(parent)
@@ -8,6 +13,7 @@ loginpage::loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     , authManager(authManager)
 {
     ui->setupUi(this);
+
 
     connect(ui->loginButton, &QPushButton::clicked, this, &loginpage::onLoginButtonClicked);
     connect(ui->registerButton, &QPushButton::clicked, this, &loginpage::onRegisterButtonClicked);
@@ -40,5 +46,38 @@ void loginpage::onLoginButtonClicked()
 
 void loginpage::onRegisterButtonClicked()
 {
-    QMessageBox::information(this, "Register", "Registration page will be added soon!");
+    qDebug() << "Register button clicked!";
+
+    RegisterPage *registerPage = new RegisterPage(authManager, this);
+    if (registerPage) {
+        // تنظیم اندازه و موقعیت
+        registerPage->setWindowTitle("Register");
+        registerPage->resize(450, 700);
+        registerPage->setWindowModality(Qt::ApplicationModal);
+
+        registerPage->setGeometry(
+            QStyle::alignedRect(
+                Qt::LeftToRight,
+                Qt::AlignCenter,
+                registerPage->size(),
+                qApp->primaryScreen()->availableGeometry()
+                )
+            );
+
+        registerPage->show();
+    } else {
+        qDebug() << "Failed to create RegisterPage!";
+    }
 }
+
+void loginpage::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    if (ui->frame) {
+        int x = (this->width() - ui->frame->width()) / 2;
+        int y = (this->height() - ui->frame->height()) / 2;
+        ui->frame->move(x, y);
+    }
+}
+

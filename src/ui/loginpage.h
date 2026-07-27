@@ -1,15 +1,17 @@
 #ifndef LOGINPAGE_H
 #define LOGINPAGE_H
 
-#include <QMainWindow>  // <-- QWidget رو به QMainWindow تغییر بده
+#include <QMainWindow>
 #include <memory>
+#include "registerpage.h"
 #include "../auth/AuthManager.h"
+#include <QResizeEvent>
 
 namespace Ui {
 class loginpage;
 }
 
-class loginpage : public QMainWindow  // <-- QWidget رو به QMainWindow تغییر بده
+class loginpage : public QMainWindow
 {
     Q_OBJECT
 
@@ -24,6 +26,9 @@ private slots:
 private:
     Ui::loginpage *ui;
     std::shared_ptr<AuthManager> authManager;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif // LOGINPAGE_H

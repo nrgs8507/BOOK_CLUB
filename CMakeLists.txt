@@ -20,6 +20,7 @@ qt_add_executable(BOOK_CLUB
     src/ui/loginpage.h src/ui/loginpage.cpp src/ui/loginpage.ui
     src/repository/irepository.h
     src/repository/filerepository.h
+    src/ui/registerpage.h src/ui/registerpage.cpp
 )
 
 target_link_libraries(BOOK_CLUB
