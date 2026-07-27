@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <memory>
-#include "../repository/FileRepository.h"
+#include "../repository/filerepository.h"
 #include "../models/User.h"
 
 class AuthManager {

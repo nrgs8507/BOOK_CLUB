@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 #include <QDebug>
 #include "src/ui/loginpage.h"
 #include "src/auth/AuthManager.h"
-#include "src/repository/FileRepository.h"
+#include "src/repository/filerepository.h"
 #include "src/models/User.h"
 
 int main(int argc, char *argv[])
