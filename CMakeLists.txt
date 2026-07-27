@@ -21,6 +21,7 @@ qt_add_executable(BOOK_CLUB
     src/repository/irepository.h
     src/repository/filerepository.h
     src/ui/registerpage.h src/ui/registerpage.cpp
+    src/ui/forgotpasswordpage.h src/ui/forgotpasswordpage.cpp
 )
 
 target_link_libraries(BOOK_CLUB

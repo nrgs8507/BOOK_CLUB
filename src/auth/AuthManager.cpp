@@ -91,3 +91,14 @@ bool AuthManager::usernameExists(const QString& username) const {
     }
     return false;
 }
+
+std::shared_ptr<User> AuthManager::findUser(const QString& username) const
+{
+    QVector<User> allUsers = userRepository->getAll();
+    for (const User& user : allUsers) {
+        if (user.getUsername() == username) {
+            return std::make_shared<User>(user);
+        }
+    }
+    return nullptr;
+}

@@ -24,6 +24,8 @@ public:
 
     bool usernameExists(const QString& username) const;
 
+    std::shared_ptr<User> findUser(const QString& username) const;
+
 private:
     std::shared_ptr<FileRepository<User>> userRepository;
     QString hashString(const QString& input) const;

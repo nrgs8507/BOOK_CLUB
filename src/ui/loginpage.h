@@ -22,6 +22,7 @@ public:
 private slots:
     void onLoginButtonClicked();
     void onRegisterButtonClicked();
+    void onForgotPasswordClicked();
 
 private:
     Ui::loginpage *ui;
