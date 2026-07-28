@@ -1,5 +1,7 @@
 #include "registerpage.h"
 #include <QMessageBox>
+#include "../network/networkclient.h"
+#include <QJsonObject>
 
 RegisterPage::RegisterPage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     : QWidget(parent)
@@ -112,6 +114,10 @@ RegisterPage::RegisterPage(std::shared_ptr<AuthManager> authManager, QWidget *pa
     // ========== Connections ==========
     connect(registerButton, &QPushButton::clicked, this, &RegisterPage::onRegisterClicked);
     connect(backToLoginButton, &QPushButton::clicked, this, &RegisterPage::close);
+
+    networkClient = new NetworkClient(this);
+    networkClient->connectToServer("127.0.0.1", 5050);
+    connect(networkClient, &NetworkClient::responseReceived, this, &RegisterPage::onRegisterResponse);
 }
 void RegisterPage::onRegisterClicked()
 {
@@ -143,14 +149,27 @@ void RegisterPage::onRegisterClicked()
     }
 
     // ========== Register ==========
-    bool success = authManager->registerUser(username, password, fullName,
-                                             securityQuestion, securityAnswer);
+    QJsonObject request;
+    request["action"] = "register";
+    request["username"] = username;
+    request["password"] = password;
+    request["fullName"] = fullName;
+    request["securityQuestion"] = securityQuestion;
+    request["securityAnswer"] = securityAnswer;
+    networkClient->sendRequest(request);
+}
 
-    if (success) {
+void RegisterPage::onRegisterResponse(const QJsonObject &response)
+{
+    if (response.value("action").toString() != "register") {
+        return;
+    }
+
+    if (response.value("status").toString() == "ok") {
         QMessageBox::information(this, "Success", "Account created! Please login.");
         close(); // Go back to login page
     } else {
-        errorLabel->setText("Username already exists or registration failed.");
+        errorLabel->setText(response.value("message").toString());
         errorLabel->setVisible(true);
     }
 }

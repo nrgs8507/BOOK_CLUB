@@ -5,7 +5,9 @@
 #include <memory>
 #include "registerpage.h"
 #include "../auth/AuthManager.h"
+#include "../network/networkclient.h"
 #include <QResizeEvent>
+#include <QJsonObject>
 
 namespace Ui {
 class loginpage;
@@ -23,10 +25,12 @@ private slots:
     void onLoginButtonClicked();
     void onRegisterButtonClicked();
     void onForgotPasswordClicked();
+    void onLoginResponse(const QJsonObject &response);
 
 private:
     Ui::loginpage *ui;
     std::shared_ptr<AuthManager> authManager;
+    NetworkClient *networkClient;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

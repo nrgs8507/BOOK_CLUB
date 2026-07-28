@@ -2,6 +2,7 @@
 #include "ui_loginpage.h"
 #include "registerpage.h"
 #include "forgotpasswordpage.h"
+#include "../network/networkclient.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QStyle>
@@ -55,6 +56,14 @@ loginpage::loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     forgotButton->show();
 
     connect(forgotButton, &QPushButton::clicked, this, &loginpage::onForgotPasswordClicked);
+
+    networkClient = new NetworkClient(this);
+    networkClient->connectToServer("127.0.0.1", 5050);
+    connect(networkClient, &NetworkClient::responseReceived, this, &loginpage::onLoginResponse);
+    connect(networkClient, &NetworkClient::connectionError, this, [this](const QString &msg) {
+        ui->errorLabel->setText("Cannot reach server: " + msg);
+        ui->errorLabel->setVisible(true);
+    });
 }
 
 loginpage::~loginpage()
@@ -73,11 +82,23 @@ void loginpage::onLoginButtonClicked()
         return;
     }
 
-    auto user = authManager->login(username, password);
-    if (user) {
-        QMessageBox::information(this, "Success", "Welcome " + user->getFullName());
+    QJsonObject request;
+    request["action"] = "login";
+    request["username"] = username;
+    request["password"] = password;
+    networkClient->sendRequest(request);
+}
+
+void loginpage::onLoginResponse(const QJsonObject &response)
+{
+    if (response.value("action").toString() != "login") {
+        return;
+    }
+
+    if (response.value("status").toString() == "ok") {
+        QMessageBox::information(this, "Success", "Welcome " + response.value("fullName").toString());
     } else {
-        ui->errorLabel->setText("Invalid username or password.");
+        ui->errorLabel->setText(response.value("message").toString());
         ui->errorLabel->setVisible(true);
     }
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(BOOK_CLUB LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Network)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 qt_standard_project_setup()
@@ -22,12 +22,33 @@ qt_add_executable(BOOK_CLUB
     src/repository/filerepository.h
     src/ui/registerpage.h src/ui/registerpage.cpp
     src/ui/forgotpasswordpage.h src/ui/forgotpasswordpage.cpp
+    src/network/networkclient.h src/network/networkclient.cpp
+
 )
 
 target_link_libraries(BOOK_CLUB
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::Network
+)
+
+qt_add_executable(BOOK_CLUB_SERVER
+    server_main.cpp
+    src/models/Account.h src/models/Account.cpp
+    src/models/User.h src/models/User.cpp
+    src/auth/AuthManager.h src/auth/AuthManager.cpp
+    src/utils/cryptomanager.h src/utils/cryptomanager.cpp
+    src/repository/irepository.h
+    src/repository/filerepository.h
+    src/network/clienthandler.h src/network/clienthandler.cpp
+    src/network/tcpserver.h src/network/tcpserver.cpp
+)
+
+target_link_libraries(BOOK_CLUB_SERVER
+    PRIVATE
+        Qt::Core
+        Qt::Network
 )
 
 install(TARGETS BOOK_CLUB

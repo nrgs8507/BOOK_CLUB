@@ -6,8 +6,10 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QJsonObject>
 #include <memory>
 #include "../auth/AuthManager.h"
+#include "../network/networkclient.h"
 
 class RegisterPage : public QWidget
 {
@@ -18,6 +20,7 @@ public:
 
 private slots:
     void onRegisterClicked();
+    void onRegisterResponse(const QJsonObject &response);
 
 private:
     std::shared_ptr<AuthManager> authManager;
@@ -38,6 +41,7 @@ private:
     QPushButton *registerButton;
     QPushButton *backToLoginButton;
     QLabel *errorLabel;
+    NetworkClient *networkClient;
 };
 
 #endif // REGISTERPAGE_H
