@@ -20,8 +20,15 @@ bool AuthManager::registerUser(const QString& username, const QString& password,
     QString hashedPassword = hashString(password);
     QString hashedSecurityAnswer = CryptoManager::encryptTwoWay(securityAnswer);
 
-    static int nextUserId = 1;
-    int userId = nextUserId++;
+    // Compute next id from existing data instead of an in-memory counter,
+    // so ids stay unique across separate runs of the app.
+    int nextUserId = 1;
+    for (const User& existing : userRepository->getAll()) {
+        if (existing.getId() >= nextUserId) {
+            nextUserId = existing.getId() + 1;
+        }
+    }
+    int userId = nextUserId;
 
     User newUser(userId, username, hashedPassword, fullName,
                  securityQuestion, hashedSecurityAnswer, {});

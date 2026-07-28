@@ -1,9 +1,12 @@
 #pragma once
 #include "irepository.h"
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QDebug>
 #include <stdexcept>
 
 template <typename T>
@@ -71,8 +74,20 @@ private:
             array.append(item.toJson());
         }
         QJsonDocument doc(array);
+
+        // Make sure the parent directory (e.g. "data/") actually exists,
+        // otherwise QFile::open silently fails and nothing gets saved.
+        QFileInfo info(filePath);
+        QDir dir = info.absoluteDir();
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+
         QFile file(filePath);
-        file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            qWarning() << "FileRepository: failed to open" << filePath << "for writing:" << file.errorString();
+            return;
+        }
         file.write(doc.toJson());
         file.close();
     }

@@ -37,9 +37,9 @@ loginpage::loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     connect(ui->loginButton, &QPushButton::clicked, this, &loginpage::onLoginButtonClicked);
     connect(ui->registerButton, &QPushButton::clicked, this, &loginpage::onRegisterButtonClicked);
 
-    // ========== دکمه‌ی فراموشی رمز (ساخت دستی با ظاهر لینک) ==========
-    QPushButton *forgotButton = new QPushButton("Forgot Password?", this);
+    QPushButton *forgotButton = new QPushButton("Forgot Password?", ui->frame);
     forgotButton->setObjectName("forgotButton");
+    forgotButton->setGeometry(85, 244, 180, 20); // زیر دکمه‌های Login/Create Account (y=210, height=31) و بالای errorLabel (y=270)
     forgotButton->setStyleSheet(
         "QPushButton#forgotButton {"
         "    background: none;"
@@ -52,16 +52,7 @@ loginpage::loginpage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
         "    color: #7C73FF;"
         "}"
         );
-
-    // پیدا کردن layout اصلی که دکمه‌های Login و Register داخل آن هستند
-    QLayout *mainLayout = this->layout();
-    if (mainLayout) {
-        mainLayout->addWidget(forgotButton);
-    } else {
-        // اگر به هر دلیلی layout وجود نداشت، یک layout جدید بساز
-        QVBoxLayout *newLayout = new QVBoxLayout(this);
-        newLayout->addWidget(forgotButton);
-    }
+    forgotButton->show();
 
     connect(forgotButton, &QPushButton::clicked, this, &loginpage::onForgotPasswordClicked);
 }
@@ -130,14 +121,18 @@ void loginpage::resizeEvent(QResizeEvent *event)
 void loginpage::onForgotPasswordClicked()
 {
     ForgotPasswordPage *forgotPage = new ForgotPasswordPage(authManager, this);
-
-    // ========== وسط‌چین کردن ==========
-    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
-    int x = (screenGeometry.width() - forgotPage->width()) / 2;
-    int y = (screenGeometry.height() - forgotPage->height()) / 2;
-    forgotPage->move(x, y);
-
     forgotPage->setWindowTitle("Reset Password");
+    forgotPage->setWindowModality(Qt::ApplicationModal);
+
     forgotPage->resize(400, 500);
+    forgotPage->setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            forgotPage->size(),
+            qApp->primaryScreen()->availableGeometry()
+            )
+        );
+
     forgotPage->show();
 }
