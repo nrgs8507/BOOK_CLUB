@@ -57,6 +57,17 @@ void TcpServer::handleRequest(ClientHandler *client, const QJsonObject &request)
             response["message"] = alreadyExists ? "Username already exists." : "Registration failed.";
         }
     }
+    else if (action == "getSecurityQuestion") {
+        QString username = request.value("username").toString();
+        auto user = authManager->findUser(username);
+        if (user) {
+            response["status"] = "ok";
+            response["securityQuestion"] = user->getSecurityQuestion();
+        } else {
+            response["status"] = "error";
+            response["message"] = "Username not found.";
+        }
+    }
     else if (action == "forgotPassword") {
         bool ok = authManager->forgotPassword(
             request.value("username").toString(),

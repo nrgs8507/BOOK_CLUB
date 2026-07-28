@@ -1,5 +1,7 @@
 #include "forgotpasswordpage.h"
 #include <QMessageBox>
+#include "../network/networkclient.h"
+#include <QJsonObject>
 
 ForgotPasswordPage::ForgotPasswordPage(std::shared_ptr<AuthManager> authManager, QWidget *parent)
     : QWidget(parent)
@@ -109,19 +111,18 @@ ForgotPasswordPage::ForgotPasswordPage(std::shared_ptr<AuthManager> authManager,
     connect(usernameEdit, &QLineEdit::textChanged, [this]() {
         QString username = usernameEdit->text().trimmed();
         if (!username.isEmpty()) {
-            auto user = this->authManager->findUser(username);
-            if (user) {
-                securityQuestionDisplay->setText(user->getSecurityQuestion());
-                securityQuestionDisplay->setStyleSheet("color: #6C63FF;");
-            } else {
-                securityQuestionDisplay->setText("Username not found");
-                securityQuestionDisplay->setStyleSheet("color: red;");
-            }
+            QJsonObject request;
+            request["action"] = "getSecurityQuestion";
+            request["username"] = username;
+            networkClient->sendRequest(request);
         } else {
             securityQuestionDisplay->setText("(Enter your username first)");
             securityQuestionDisplay->setStyleSheet("color: #6C63FF;");
         }
     });
+    networkClient = new NetworkClient(this);
+    networkClient->connectToServer("127.0.0.1", 5050);
+    connect(networkClient, &NetworkClient::responseReceived, this, &ForgotPasswordPage::onNetworkResponse);
 }
 
 void ForgotPasswordPage::onResetClicked()
@@ -142,12 +143,34 @@ void ForgotPasswordPage::onResetClicked()
         return;
     }
 
-    bool success = authManager->forgotPassword(username, securityAnswer, newPassword);
-    if (success) {
-        QMessageBox::information(this, "Success", "Password reset successfully! Please login.");
-        close();
-    } else {
-        errorLabel->setText("Invalid username or security answer.");
-        errorLabel->setVisible(true);
+    QJsonObject request;
+    request["action"] = "forgotPassword";
+    request["username"] = username;
+    request["securityAnswer"] = securityAnswer;
+    request["newPassword"] = newPassword;
+    networkClient->sendRequest(request);
+}
+
+void ForgotPasswordPage::onNetworkResponse(const QJsonObject &response)
+{
+    QString action = response.value("action").toString();
+
+    if (action == "getSecurityQuestion") {
+        if (response.value("status").toString() == "ok") {
+            securityQuestionDisplay->setText(response.value("securityQuestion").toString());
+            securityQuestionDisplay->setStyleSheet("color: #6C63FF;");
+        } else {
+            securityQuestionDisplay->setText("Username not found");
+            securityQuestionDisplay->setStyleSheet("color: red;");
+        }
+    }
+    else if (action == "forgotPassword") {
+        if (response.value("status").toString() == "ok") {
+            QMessageBox::information(this, "Success", "Password reset successfully! Please login.");
+            close();
+        } else {
+            errorLabel->setText(response.value("message").toString());
+            errorLabel->setVisible(true);
+        }
     }
 }

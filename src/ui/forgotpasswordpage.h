@@ -5,9 +5,11 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QJsonObject>
 #include <QVBoxLayout>
 #include <memory>
 #include "../auth/AuthManager.h"
+#include "../network/networkclient.h"
 
 class ForgotPasswordPage : public QWidget
 {
@@ -18,6 +20,7 @@ public:
 
 private slots:
     void onResetClicked();
+    void onNetworkResponse(const QJsonObject &response);
 
 private:
     std::shared_ptr<AuthManager> authManager;
@@ -33,6 +36,7 @@ private:
     QPushButton *resetButton;
     QPushButton *backToLoginButton;
     QLabel *errorLabel;
+    NetworkClient *networkClient;
 };
 
 #endif
