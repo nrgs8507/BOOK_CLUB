@@ -6,6 +6,8 @@
 #include "registerpage.h"
 #include "../auth/AuthManager.h"
 #include "../network/networkclient.h"
+#include "../ui/searchbookpage.h"
+#include "../ui/searchresultspage.h"
 #include <QResizeEvent>
 #include <QJsonObject>
 

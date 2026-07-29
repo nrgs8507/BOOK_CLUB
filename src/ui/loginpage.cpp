@@ -95,12 +95,37 @@ void loginpage::onLoginResponse(const QJsonObject &response)
         return;
     }
 
-    if (response.value("status").toString() == "ok") {
-        QMessageBox::information(this, "Success", "Welcome " + response.value("fullName").toString());
-    } else {
+    if (response.value("status").toString() != "ok") {
         ui->errorLabel->setText(response.value("message").toString());
         ui->errorLabel->setVisible(true);
+        return;
     }
+
+    SearchBookPage *searchPage = new SearchBookPage(networkClient);
+    searchPage->setWindowTitle("Search Books");
+    searchPage->resize(600, 500);
+    searchPage->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(searchPage, &SearchBookPage::showResultsRequested, searchPage,
+            [searchPage](const QJsonArray &books) {
+                SearchResultsPage *resultsPage = new SearchResultsPage();
+                resultsPage->setWindowTitle("Search Results");
+                resultsPage->resize(600, 500);
+                resultsPage->setAttribute(Qt::WA_DeleteOnClose);
+                resultsPage->setBooks(books);
+
+                connect(resultsPage, &SearchResultsPage::backRequested, resultsPage,
+                        [resultsPage, searchPage]() {
+                            resultsPage->close();
+                            searchPage->show();
+                        });
+
+                searchPage->hide();
+                resultsPage->show();
+            });
+
+    searchPage->show();
+    this->close();
 }
 
 void loginpage::onRegisterButtonClicked()
