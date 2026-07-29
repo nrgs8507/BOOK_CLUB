@@ -1,9 +1,9 @@
 #include "book.h"
 #include "discount.h"
 
-//Book::Book()
-//    : bookId(-1), price(0.0), publisherId(-1), isActive(true),
-//    averageRating(0.0), salesCount(0), publishDate(QDate::currentDate()), discount(nullptr) {}
+Book:://Book()
+    //: bookId(-1), price(0.0), publisherId(-1), isActive(true),
+    //averageRating(0.0), salesCount(0), publishDate(QDate::currentDate()), discount(nullptr) {}
 
 Book::Book(int bookId, const QString& title, const QString& author, const QString& genre,
            const QString& description, double price, const QString& coverImagePath,

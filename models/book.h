@@ -24,7 +24,7 @@ private:
     std::shared_ptr<Discount> discount;
 
 public:
-    //Book();
+    // Book();
     Book(int bookId, const QString& title, const QString& author, const QString& genre,
          const QString& description, double price, const QString& coverImagePath,
          const QString& pdfFilePath, int publisherId, const QDate& publishDate = QDate::currentDate());
