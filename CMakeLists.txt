@@ -42,6 +42,8 @@ qt_add_executable(BOOK_CLUB_SERVER
     src/models/User.h src/models/User.cpp
     src/models/book.h src/models/book.cpp
     src/models/discount.h
+    src/models/percentdiscount.h src/models/percentdiscount.cpp
+    src/models/timeddiscount.h src/models/timeddiscount.cpp
     src/managers/bookmanager.h src/managers/bookmanager.cpp
     src/auth/AuthManager.h src/auth/AuthManager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
@@ -51,6 +53,17 @@ qt_add_executable(BOOK_CLUB_SERVER
     src/repository/filebookstorage.h src/repository/filebookstorage.cpp
     src/network/clienthandler.h src/network/clienthandler.cpp
     src/network/tcpserver.h src/network/tcpserver.cpp
+    src/models/cart.h src/models/cart.cpp
+    src/models/library.h src/models/library.cpp
+    src/models/shelf.h src/models/shelf.cpp
+    src/models/transaction.h src/models/transaction.cpp
+    src/managers/cartmanager.h src/managers/cartmanager.cpp
+    src/managers/librarymanager.h src/managers/librarymanager.cpp
+    src/managers/discountmanager.h src/managers/discountmanager.cpp
+    src/managers/transactionmanager.h src/managers/transactionmanager.cpp
+    src/repository/icartstorage.h src/repository/filecartstorage.h src/repository/filecartstorage.cpp
+    src/repository/ilibrarystorage.h src/repository/filelibrarystorage.h src/repository/filelibrarystorage.cpp
+    src/repository/itransactionstorage.h src/repository/filetransactionstorage.h src/repository/filetransactionstorage.cpp
 )
 
 target_link_libraries(BOOK_CLUB_SERVER
