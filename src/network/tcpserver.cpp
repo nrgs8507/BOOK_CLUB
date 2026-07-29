@@ -1,9 +1,35 @@
 #include "tcpserver.h"
 #include <QJsonObject>
 #include <QDebug>
+#include <QFile>
+#include <QJsonArray>
 
-TcpServer::TcpServer(std::shared_ptr<AuthManager> authManager, QObject *parent)
-    : QTcpServer(parent), authManager(authManager) {}
+TcpServer::TcpServer(std::shared_ptr<AuthManager> authManager,BookManager* bookManager, QObject *parent)
+    : QTcpServer(parent), authManager(authManager) , bookManager(bookManager){}
+
+QJsonObject TcpServer::bookToJson(const Book& book)
+{
+    QJsonObject obj;
+    obj["bookId"] = book.getBookId();
+    obj["title"] = book.getTitle();
+    obj["author"] = book.getAuthor();
+    obj["genre"] = book.getGenre();
+    obj["price"] = book.getPrice();
+    obj["finalPrice"] = book.getFinalPrice();
+    obj["averageRating"] = book.hasReviews() ? book.getAverageRating() : -1.0;
+
+    QByteArray imageBytes;
+    QString imagePath = book.getCoverImagePath();
+    if (!imagePath.isEmpty()) {
+        QFile imgFile(imagePath);
+        if (imgFile.open(QIODevice::ReadOnly)) {
+            imageBytes = imgFile.readAll();
+        }
+    }
+    obj["coverImageBase64"] = QString::fromLatin1(imageBytes.toBase64());
+
+    return obj;
+}
 
 void TcpServer::incomingConnection(qintptr socketDescriptor)
 {
@@ -76,6 +102,30 @@ void TcpServer::handleRequest(ClientHandler *client, const QJsonObject &request)
             );
         response["status"] = ok ? "ok" : "error";
         if (!ok) response["message"] = "Username or security answer is incorrect.";
+    }
+    else if (action == "getAllBooks") {
+        QJsonArray booksArray;
+        for (const Book& b : bookManager->getActiveBooks()) {
+            booksArray.append(bookToJson(b));
+        }
+        response["status"] = "ok";
+        response["books"] = booksArray;
+    }
+    else if (action == "searchBooks") {
+        QString searchBy = request.value("searchBy").toString();
+        QString query = request.value("query").toString();
+
+        QVector<Book> results;
+        if (searchBy == "title") results = bookManager->searchByTitle(query);
+        else if (searchBy == "author") results = bookManager->searchByAuthor(query);
+        else if (searchBy == "genre") results = bookManager->searchByGenre(query);
+
+        QJsonArray booksArray;
+        for (const Book& b : results) {
+            if (b.getIsActive()) booksArray.append(bookToJson(b));
+        }
+        response["status"] = "ok";
+        response["books"] = booksArray;
     }
     else {
         response["status"] = "error";

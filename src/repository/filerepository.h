@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 template <typename T>
-class FileRepository : public IRepository<T> {
+class FileRepository : public virtual IRepository<T> {
 protected:
     QString filePath;
 

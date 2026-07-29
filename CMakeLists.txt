@@ -22,6 +22,9 @@ qt_add_executable(BOOK_CLUB
     src/repository/filerepository.h
     src/ui/registerpage.h src/ui/registerpage.cpp
     src/ui/forgotpasswordpage.h src/ui/forgotpasswordpage.cpp
+    src/ui/bookcardwidget.h src/ui/bookcardwidget.cpp
+    src/ui/searchresultspage.h src/ui/searchresultspage.cpp
+    src/ui/searchbookpage.h src/ui/searchbookpage.cpp src/ui/searchbookpage.ui
     src/network/networkclient.h src/network/networkclient.cpp
 
 )
@@ -37,10 +40,15 @@ qt_add_executable(BOOK_CLUB_SERVER
     server_main.cpp
     src/models/Account.h src/models/Account.cpp
     src/models/User.h src/models/User.cpp
+    src/models/book.h src/models/book.cpp
+    src/models/discount.h
+    src/managers/bookmanager.h src/managers/bookmanager.cpp
     src/auth/AuthManager.h src/auth/AuthManager.cpp
     src/utils/cryptomanager.h src/utils/cryptomanager.cpp
     src/repository/irepository.h
     src/repository/filerepository.h
+    src/repository/ibookstorage.h
+    src/repository/filebookstorage.h src/repository/filebookstorage.cpp
     src/network/clienthandler.h src/network/clienthandler.cpp
     src/network/tcpserver.h src/network/tcpserver.cpp
 )
